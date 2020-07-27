@@ -169,6 +169,7 @@ window.addEventListener("gamepadconnected", function (e) {
 });
 
 const clear = () => {
+    // FUTURE: only clear parts that get redrawn (game board and side bar)
     ctx.clearRect(0, 0, canvas.height, canvas.width);
 };
 
@@ -267,6 +268,7 @@ state.board[19][9] = 'rgb(255, 0, 0)';
 const update = (frameTimestamp) => {
     determineUserInput();
 
+    // TODO: handle pause
     updateState();
 
     updateFPS();
@@ -274,6 +276,7 @@ const update = (frameTimestamp) => {
 
 const render = () => {
     clear();
+    // FUTURE: only drawboard once and don't clear it (static)
     drawBoard();
     drawSideBar(state);
     drawState(state);
