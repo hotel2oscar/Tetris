@@ -16,7 +16,7 @@ const state = {
     level: 0,
     score: 0,
     lines: 0,
-    board: initializeBoard(),
+    time: 0,
     performance: {
         show: true,
         fps: 0,
@@ -24,7 +24,8 @@ const state = {
     },
     paused: true,
     gameOver: true,
-    activeBlock: { x: 0, y: 0 }
+    activeBlock: { x: 0, y: 0 },
+    board: initializeBoard(),
 };
 
 (function run() {

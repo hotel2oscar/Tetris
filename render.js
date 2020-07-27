@@ -61,11 +61,12 @@ const drawSideBar = (state) => {
     };
 
     drawText('LEVEL', state.level, 9);
-    drawText('SCORE', state.score, 12);
-    drawText('LINES', state.lines, 15);
+    drawText('SCORE', state.score, 11);
+    drawText('LINES', state.lines, 13);
+    drawText('TIME', state.time, 15);
 
     if (state.performance.show) {
-        drawText('FPS', state.performance.fps, 18);
+        drawText('FPS', state.performance.fps, 17);
     }
 };
 
