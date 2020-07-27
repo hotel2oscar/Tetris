@@ -3,7 +3,7 @@ const CONSTANTS = {
         WIDTH: 10,
         HEIGHT: 20,
     },
-    BLOCKSIZE: 20,
+    BLOCKSIZE: 25,
 
     //TODO: color constants
     COLORS: {

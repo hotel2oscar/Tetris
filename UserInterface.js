@@ -8,9 +8,9 @@ class UserInterface {
         this._height = canvas.height;
         this._width = canvas.width;
 
-        this._boardOffset = { x: 1 * CONSTANTS.BLOCKSIZE, y: 1 * CONSTANTS.BLOCKSIZE };
-        this._stateOffset = { x: 2 * CONSTANTS.BLOCKSIZE, y: (CONSTANTS.BOARD.HEIGHT + 1) * CONSTANTS.BLOCKSIZE };
-        this._sideBarOffset = { x: 15 * CONSTANTS.BLOCKSIZE, y: 2 * CONSTANTS.BLOCKSIZE };
+        this._boardOffset = { x: 1, y: 1 };
+        this._stateOffset = { x: this._boardOffset.x + 1 , y: this._boardOffset.y + CONSTANTS.BOARD.HEIGHT };
+        this._sideBarOffset = { x: 15 , y: 2 };
 
         this._drawBoard();
     }
@@ -20,9 +20,21 @@ class UserInterface {
         this._ctx.clearRect(0, 0, this._width, this._height);
     }
 
-    _drawBlock(x, y, width) {
-        this._ctx.fillRect(x, y, width, width);
-        this._ctx.strokeRect(x, y, width, width);
+    _fillRect(x, y, width, height) {
+        this._ctx.fillRect(x * CONSTANTS.BLOCKSIZE, y * CONSTANTS.BLOCKSIZE, width * CONSTANTS.BLOCKSIZE, height * CONSTANTS.BLOCKSIZE);
+    }
+
+    _strokeRect(x, y, width, height) {
+        this._ctx.strokeRect(x * CONSTANTS.BLOCKSIZE, y * CONSTANTS.BLOCKSIZE, width * CONSTANTS.BLOCKSIZE, height * CONSTANTS.BLOCKSIZE);
+    }
+
+    _fillText(text, x, y) {
+        this._ctx.fillText(text, x * CONSTANTS.BLOCKSIZE, y * CONSTANTS.BLOCKSIZE);
+    }
+    
+    _drawBlock(x, y) {
+        this._fillRect(x, y, 1, 1);
+        this._strokeRect(x, y, 1, 1);
     }
 
     _drawBoard() {
@@ -37,40 +49,38 @@ class UserInterface {
         const drawEdge = (edgeSize, updateCoordinates) => {
             for (var i = 0; i < edgeSize; i++) {
 
-                this._drawBlock(position.x, position.y, CONSTANTS.BLOCKSIZE);
+                this._drawBlock(position.x, position.y);
 
                 updateCoordinates();
             }
         };
 
         // top
-        drawEdge(EDGEWIDTH, () => position.x += CONSTANTS.BLOCKSIZE);
+        drawEdge(EDGEWIDTH, () => position.x += 1);
 
         // right
-        drawEdge(EDGEHEIGHT, () => position.y += CONSTANTS.BLOCKSIZE);
+        drawEdge(EDGEHEIGHT, () => position.y += 1);
 
         // bottom
-        drawEdge(EDGEWIDTH, () => position.x -= CONSTANTS.BLOCKSIZE);
+        drawEdge(EDGEWIDTH, () => position.x -= 1);
 
         // left
-        drawEdge(EDGEHEIGHT, () => position.y -= CONSTANTS.BLOCKSIZE);
+        drawEdge(EDGEHEIGHT, () => position.y -= 1);
     }
 
     _drawSideBar(state) {
         this._ctx.strokeStyle = CONSTANTS.COLORS.BLACK;
         this._ctx.fillStyle = CONSTANTS.COLORS.BLACK;
 
-        this._ctx.strokeRect(this._sideBarOffset.x, this._sideBarOffset.y, CONSTANTS.BLOCKSIZE * 8, CONSTANTS.BLOCKSIZE * 20);
+        this._strokeRect(this._sideBarOffset.x, this._sideBarOffset.y, 8, 20);
+        this._strokeRect(this._sideBarOffset.x + 1, this._sideBarOffset.y + 1, 6, 6);
 
-        // next block window
-        this._ctx.strokeRect(this._sideBarOffset.x + CONSTANTS.BLOCKSIZE, this._sideBarOffset.y + CONSTANTS.BLOCKSIZE, CONSTANTS.BLOCKSIZE * 6, CONSTANTS.BLOCKSIZE * 6);
-
-        // TODO: draw next block
-        let nextBlockOffset = { x: this._sideBarOffset.x + 1 * CONSTANTS.BLOCKSIZE, y: (this._sideBarOffset.y + 7) * CONSTANTS.BLOCKSIZE };
+        // bottom left of next block window
+        let nextBlockOffset = { x: this._sideBarOffset.x + 1, y: this._sideBarOffset.y + 7 };
 
         const drawText = (label, value, y) => {
-            this._ctx.fillText(label + ':', this._sideBarOffset.x + 2 * CONSTANTS.BLOCKSIZE, this._sideBarOffset.y + y * CONSTANTS.BLOCKSIZE);
-            this._ctx.fillText(`${value}`, this._sideBarOffset.x + 3 * CONSTANTS.BLOCKSIZE, this._sideBarOffset.y + (y + 1) * CONSTANTS.BLOCKSIZE);
+            this._fillText(label + ':', this._sideBarOffset.x + 2, this._sideBarOffset.y + y);
+            this._fillText(`${value}`, this._sideBarOffset.x + 3, this._sideBarOffset.y + y + 1);
         };
 
         drawText('LEVEL', state.level, 9);
@@ -88,8 +98,8 @@ class UserInterface {
         this._ctx.fillStyle = CONSTANTS.COLORS.BLACK;
 
         const convertCoordinates = (x, y) => {
-            let actualX = this._stateOffset.x + x * CONSTANTS.BLOCKSIZE;
-            let actualY = this._stateOffset.y - y * CONSTANTS.BLOCKSIZE;
+            let actualX = this._stateOffset.x + x;
+            let actualY = this._stateOffset.y - y;
 
             return { x: actualX, y: actualY };
         };
@@ -97,7 +107,7 @@ class UserInterface {
         const drawText = (text, x, y) => {
             let position = convertCoordinates(x, y);
 
-            this._ctx.fillText(text, position.x, position.y);
+            this._fillText(text, position.x, position.y);
         };
 
         if (state.paused) {
@@ -116,7 +126,7 @@ class UserInterface {
 
                         let position = convertCoordinates(x, y);
 
-                        this._drawBlock(position.x, position.y, CONSTANTS.BLOCKSIZE);
+                        this._drawBlock(position.x, position.y);
                     }
                 }
             }

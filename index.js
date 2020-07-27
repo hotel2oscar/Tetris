@@ -24,7 +24,8 @@ const state = {
     },
     paused: true,
     gameOver: true,
-    activeBlock: { x: 0, y: 0 },
+    nextBlock: new OBlock(), // TODO: randomize
+    activeBlock: new OBlock(), // TODO: randomize
     board: initializeBoard(),
 };
 
