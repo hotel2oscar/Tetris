@@ -24,20 +24,6 @@ const state = {
     paused: false
 };
 
-const updateState = (inputState) => {
-    // TODO: handle pause here
-    // TODO: update game state
-};
-
-const updateFPS = () => {
-    const now = performance.now();
-    while (state.performance.times.length > 0 && state.performance.times[0] <= now - 1000) {
-        state.performance.times.shift();
-    }
-    state.performance.times.push(now);
-    state.performance.fps = state.performance.times.length;
-};
-
 // TODO: remove debug code
 state.board[0][0] = 'rgb(0, 0, 255)';
 state.board[0][9] = 'rgb(0, 0, 255)';
@@ -46,19 +32,11 @@ state.board[10][9] = 'rgb(0, 255, 0)';
 state.board[19][0] = 'rgb(255, 0, 0)';
 state.board[19][9] = 'rgb(255, 0, 0)';
 
-const update = (frameTimestamp) => {
-    let inputState = determineUserInput();
-
-    updateState(inputState);
-
-    updateFPS();
-};
-
-(function run(frameTimestamp) {
+(function run() {
     // TODO: capture return value from function to get abilty to stop animation (like setTimeout)
     window.requestAnimationFrame(run);
 
-    update(frameTimestamp);
+    update(state);
 
     render(state);
 })();
