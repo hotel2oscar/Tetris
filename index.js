@@ -176,73 +176,90 @@ const clear = () => {
 let inputEnabled = true;
 
 const determineUserInput = () => {
-    // TODO: use setTimeout to disable userinput for X ms?
-    // TODO: determine if needed when testing rotation (A & B)
-    // if (inputEnabled == false) {
-    //     return;
-    // }
+    if (inputEnabled == false) {
+        return;
+    }
 
-    // inputEnabled = false;
-
-    // setTimeout(() => inputEnabled = true, 100);
+    let input = false;
 
     if (Key.isDown(Key.A)) {
+        input = true;
         console.log("Key A is pressed");
     }
 
     if (Key.isDown(Key.B)) {
+        input = true;
         console.log("Key B is pressed");
     }
 
     if (Key.isDown(Key.LEFT)) {
+        input = true;
         console.log("Key LEFT is pressed");
     }
 
     if (Key.isDown(Key.RIGHT)) {
+        input = true;
         console.log("Key RIGHT is pressed");
     }
 
     if (Key.isDown(Key.UP)) {
+        input = true;
         console.log("Key UP is pressed");
     }
 
     if (Key.isDown(Key.DOWN)) {
+        input = true;
         console.log("Key DOWN is pressed");
     }
 
     if (Key.isDown(Key.SPACE)) {
+        input = true;
         console.log("Key SPACE is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.A)) {
+        input = true;
         console.log("Gamepad A is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.B)) {
+        input = true;
         console.log("Gamepad B is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.LEFT)) {
+        input = true;
         console.log("Gamepad LEFT is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.RIGHT)) {
+        input = true;
         console.log("Gamepad RIGHT is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.UP)) {
+        input = true;
         console.log("Gamepad UP is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.DOWN)) {
+        input = true;
         console.log("Gamepad DOWN is pressed");
     }
 
     if (Gamepad.isDown(Gamepad.START)) {
+        input = true;
         console.log("Gamepad START is pressed");
     }
 
-    // TODO: cancel out opposite inputs
+    // TODO: cancel out opposite inputs (up - down; left - right; a - b)
+
+    if (input) {
+        inputEnabled = false;
+
+        // FUTURE: tweak timing for better performance
+        setTimeout(() => inputEnabled = true, 100);
+    }
 };
 
 const updateState = () => {
