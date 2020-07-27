@@ -9,8 +9,8 @@ class UserInterface {
         this._width = canvas.width;
 
         this._boardOffset = { x: 1, y: 1 };
-        this._stateOffset = { x: this._boardOffset.x + 1 , y: this._boardOffset.y + CONSTANTS.BOARD.HEIGHT };
-        this._sideBarOffset = { x: 15 , y: 2 };
+        this._stateOffset = { x: this._boardOffset.x + 1, y: this._boardOffset.y + CONSTANTS.BOARD.HEIGHT };
+        this._sideBarOffset = { x: 15, y: 2 };
 
         this._drawBoard();
     }
@@ -31,7 +31,7 @@ class UserInterface {
     _fillText(text, x, y) {
         this._ctx.fillText(text, x * CONSTANTS.BLOCKSIZE, y * CONSTANTS.BLOCKSIZE);
     }
-    
+
     _drawBlock(x, y) {
         this._fillRect(x, y, 1, 1);
         this._strokeRect(x, y, 1, 1);
@@ -76,7 +76,26 @@ class UserInterface {
         this._strokeRect(this._sideBarOffset.x + 1, this._sideBarOffset.y + 1, 6, 6);
 
         // bottom left of next block window
-        let nextBlockOffset = { x: this._sideBarOffset.x + 1, y: this._sideBarOffset.y + 7 };
+        let nextBlockOffset = { x: this._sideBarOffset.x + 1, y: this._sideBarOffset.y + 6 };
+
+        const convertCoordinates = (x, y) => {
+            let actualX = nextBlockOffset.x + x;
+            let actualY = nextBlockOffset.y - y;
+
+            return { x: actualX, y: actualY };
+        };
+
+        if (state.block.next !== null) {
+            this._ctx.fillStyle = state.block.next.color;
+
+            for (let block of state.block.next.coordinates) {
+                let position = convertCoordinates(block.x, block.y);
+
+                this._drawBlock(position.x, position.y);
+            }
+        }
+
+        this._ctx.fillStyle = CONSTANTS.COLORS.BLACK;
 
         const drawText = (label, value, y) => {
             this._fillText(label + ':', this._sideBarOffset.x + 2, this._sideBarOffset.y + y);
