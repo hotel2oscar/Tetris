@@ -10,6 +10,8 @@ const updateState = (inputState, state) => {
         }
     }
 
+    // TODO: update game state
+    // TODO: don't re-initialize board
     state.board = initializeBoard();
 
     if (inputState.Up) {
@@ -42,8 +44,6 @@ const updateState = (inputState, state) => {
     }
 
     state.board[state.activeBlock.y][state.activeBlock.x] = 'rgb(0, 0, 255)';
-
-    // TODO: update game state
 };
 
 const updateFPS = (state) => {
