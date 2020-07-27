@@ -33,11 +33,17 @@ const state = {
         types: [
             IBlock.generate,
             JBlock.generate,
-            OBlock.generate
+            LBlock.generate,
+            OBlock.generate,
+            SBlock.generate,
+            TBlock.generate,
+            ZBlock.generate,
             // TODO: one of each block
         ],
         bag: [], // TODO: shuffle 1 of each blockType and use until empty
     },
+
+    board: initializeBoard(),
 };
 
 let i = 0;
