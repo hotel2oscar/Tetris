@@ -12,40 +12,40 @@ const updateState = (inputState, state) => {
     }
 
     if (!state.paused) {
-        // TODO: update game state
-        // TODO: don't re-initialize board
-        state.board = initializeBoard();
+        // // TODO: update game state
+        // // TODO: don't re-initialize board
+        // state.board = initializeBoard();
 
-        if (inputState.Up) {
-            state.activeBlock.y += 1;
+        // if (inputState.Up) {
+        //     state.activeBlock.y += 1;
 
-            if (state.activeBlock.y > CONSTANTS.BOARDHEIGHT - 1) {
-                state.activeBlock.y = CONSTANTS.BOARDHEIGHT - 1;
-            }
-        }
-        if (inputState.Down) {
-            state.activeBlock.y -= 1;
+        //     if (state.activeBlock.y > CONSTANTS.BOARDHEIGHT - 1) {
+        //         state.activeBlock.y = CONSTANTS.BOARDHEIGHT - 1;
+        //     }
+        // }
+        // if (inputState.Down) {
+        //     state.activeBlock.y -= 1;
 
-            if (state.activeBlock.y < 0) {
-                state.activeBlock.y = 0;
-            }
-        }
-        if (inputState.Right) {
-            state.activeBlock.x += 1;
+        //     if (state.activeBlock.y < 0) {
+        //         state.activeBlock.y = 0;
+        //     }
+        // }
+        // if (inputState.Right) {
+        //     state.activeBlock.x += 1;
 
-            if (state.activeBlock.x > CONSTANTS.BOARDWIDTH - 1) {
-                state.activeBlock.x = CONSTANTS.BOARDWIDTH - 1;
-            }
-        }
-        if (inputState.Left) {
-            state.activeBlock.x -= 1;
+        //     if (state.activeBlock.x > CONSTANTS.BOARDWIDTH - 1) {
+        //         state.activeBlock.x = CONSTANTS.BOARDWIDTH - 1;
+        //     }
+        // }
+        // if (inputState.Left) {
+        //     state.activeBlock.x -= 1;
 
-            if (state.activeBlock.x < 0) {
-                state.activeBlock.x = 0;
-            }
-        }
+        //     if (state.activeBlock.x < 0) {
+        //         state.activeBlock.x = 0;
+        //     }
+        // }
 
-        state.board[state.activeBlock.y][state.activeBlock.x] = 'rgb(0, 0, 255)';
+        // state.board[state.activeBlock.y][state.activeBlock.x] = 'rgb(0, 0, 255)';
     }
 };
 

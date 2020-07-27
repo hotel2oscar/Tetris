@@ -28,6 +28,14 @@ const state = {
     board: initializeBoard(),
 };
 
+// TODO: remove debug code
+state.board[0][0] = 'rgb(0, 0, 255)';
+state.board[0][9] = 'rgb(0, 0, 255)';
+state.board[10][0] = 'rgb(0, 255, 0)';
+state.board[10][9] = 'rgb(0, 255, 0)';
+state.board[19][0] = 'rgb(255, 0, 0)';
+state.board[19][9] = 'rgb(255, 0, 0)';
+
 const ui = new UserInterface();
 const controls = new Controls();
 

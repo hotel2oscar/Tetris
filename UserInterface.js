@@ -9,8 +9,9 @@ class UserInterface {
         this._width = canvas.width;
 
         this._boardOffset = { x: 1 * CONSTANTS.BLOCKSIZE, y: 1 * CONSTANTS.BLOCKSIZE };
+        this._stateOffset = { x: 2 * CONSTANTS.BLOCKSIZE, y: (CONSTANTS.BOARD.HEIGHT + 1) * CONSTANTS.BLOCKSIZE };
         this._sideBarOffset = { x: 15 * CONSTANTS.BLOCKSIZE, y: 2 * CONSTANTS.BLOCKSIZE };
-        
+
         this._drawBoard();
     }
 
@@ -65,6 +66,7 @@ class UserInterface {
         this._ctx.strokeRect(this._sideBarOffset.x + CONSTANTS.BLOCKSIZE, this._sideBarOffset.y + CONSTANTS.BLOCKSIZE, CONSTANTS.BLOCKSIZE * 6, CONSTANTS.BLOCKSIZE * 6);
 
         // TODO: draw next block
+        let nextBlockOffset = { x: this._sideBarOffset.x + 1 * CONSTANTS.BLOCKSIZE, y: (this._sideBarOffset.y + 7) * CONSTANTS.BLOCKSIZE };
 
         const drawText = (label, value, y) => {
             this._ctx.fillText(label + ':', this._sideBarOffset.x + 2 * CONSTANTS.BLOCKSIZE, this._sideBarOffset.y + y * CONSTANTS.BLOCKSIZE);
@@ -85,12 +87,25 @@ class UserInterface {
         this._ctx.strokeStyle = CONSTANTS.COLORS.BLACK;
         this._ctx.fillStyle = CONSTANTS.COLORS.BLACK;
 
-        if (state.paused) {
-            this._ctx.fillText('PAUSED', 5 * CONSTANTS.BLOCKSIZE, 11 * CONSTANTS.BLOCKSIZE);
+        const convertCoordinates = (x, y) => {
+            let actualX = this._stateOffset.x + x * CONSTANTS.BLOCKSIZE;
+            let actualY = this._stateOffset.y - y * CONSTANTS.BLOCKSIZE;
 
-            this._ctx.fillText("PRESS START", 4 * CONSTANTS.BLOCKSIZE, 15 * CONSTANTS.BLOCKSIZE);
-            this._ctx.fillText("OR SPACE", 4 * CONSTANTS.BLOCKSIZE, 16 * CONSTANTS.BLOCKSIZE);
-            this._ctx.fillText("TO PLAY", 4 * CONSTANTS.BLOCKSIZE, 17 * CONSTANTS.BLOCKSIZE);
+            return { x: actualX, y: actualY };
+        };
+
+        const drawText = (text, x, y) => {
+            let position = convertCoordinates(x, y);
+
+            this._ctx.fillText(text, position.x, position.y);
+        };
+
+        if (state.paused) {
+            drawText('PAUSED', 3, 10);
+
+            drawText('PRESS START', 2, 7);
+            drawText('(OR SPACE)', 2, 6);
+            drawText('TO PLAY', 2, 5);
 
         } else {
             for (let y = 0; y < state.board.length; y++) {
@@ -99,11 +114,9 @@ class UserInterface {
 
                         this._ctx.fillStyle = state.board[y][x];
 
-                        // canvas 0,0 is top left, we need 0,0 to be bottom left and offset from edge like board
-                        let actualX = (2 + x) * CONSTANTS.BLOCKSIZE;
-                        let actualY = (CONSTANTS.BOARD.HEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
+                        let position = convertCoordinates(x, y);
 
-                        this._drawBlock(actualX, actualY, CONSTANTS.BLOCKSIZE);
+                        this._drawBlock(position.x, position.y, CONSTANTS.BLOCKSIZE);
                     }
                 }
             }
