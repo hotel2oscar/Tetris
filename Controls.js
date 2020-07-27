@@ -1,6 +1,7 @@
 class Keyboard {
     static _pressed = {};
 
+    // FUTURE: support mapping controls?
     static SPACE = 32;
     static A = 65;
     static B = 66;
