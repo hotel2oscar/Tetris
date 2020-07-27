@@ -1,14 +1,3 @@
-const canvas = document.getElementById('gameWindow');
-
-// FUTURE: pass ctx into functions that require it
-const ctx = canvas.getContext('2d');
-
-const CONSTANTS = {
-    BOARDWIDTH: 10,
-    BOARDHEIGHT: 20,
-    BLOCKSIZE: 20
-};
-
 const initializeBoard = () => {
     let board = new Array(CONSTANTS.BOARDHEIGHT);
 
@@ -35,90 +24,6 @@ const state = {
     paused: false
 };
 
-const drawBlock = (x, y, width) => {
-    ctx.fillRect(x, y, width, width);
-    ctx.strokeRect(x, y, width, width);
-};
-
-const drawBoard = () => {
-    let startX = CONSTANTS.BLOCKSIZE;
-    let startY = CONSTANTS.BLOCKSIZE;
-    const EDGEWIDTH = CONSTANTS.BOARDWIDTH + 1;
-    const EDGEHEIGHT = CONSTANTS.BOARDHEIGHT + 1;
-
-    ctx.fillStyle = 'rgb(82, 87, 94)';
-    ctx.strokeStyle = 'rgb(53, 57, 61)';
-
-    const drawEdge = (edgeSize, updateCoordinates) => {
-        for (var i = 0; i < edgeSize; i++) {
-
-            drawBlock(startX, startY, CONSTANTS.BLOCKSIZE);
-
-            updateCoordinates();
-        }
-    };
-
-    // top
-    drawEdge(EDGEWIDTH, () => startX += CONSTANTS.BLOCKSIZE);
-
-    // right
-    drawEdge(EDGEHEIGHT, () => startY += CONSTANTS.BLOCKSIZE);
-
-    // bottom
-    drawEdge(EDGEWIDTH, () => startX -= CONSTANTS.BLOCKSIZE);
-
-    // left
-    drawEdge(EDGEHEIGHT, () => startY -= CONSTANTS.BLOCKSIZE);
-};
-
-const drawSideBar = (state) => {
-    let startX = CONSTANTS.BLOCKSIZE * 15;
-    let startY = CONSTANTS.BLOCKSIZE * 2;
-
-    ctx.strokeRect(startX, startY, CONSTANTS.BLOCKSIZE * 8, CONSTANTS.BLOCKSIZE * 20);
-
-    // next block window
-    ctx.strokeRect(startX + CONSTANTS.BLOCKSIZE, startY + CONSTANTS.BLOCKSIZE, CONSTANTS.BLOCKSIZE * 6, CONSTANTS.BLOCKSIZE * 6);
-
-    // TODO: draw next block
-
-    ctx.font = `${CONSTANTS.BLOCKSIZE - 2}px Consolas`;
-
-    const drawText = (label, value, y) => {
-        ctx.fillText(label + ':', startX + 2 * CONSTANTS.BLOCKSIZE, startY + y * CONSTANTS.BLOCKSIZE);
-        ctx.fillText(`${value}`, startX + 3 * CONSTANTS.BLOCKSIZE, startY + (y + 1) * CONSTANTS.BLOCKSIZE);
-    };
-
-    drawText('LEVEL', state.level, 9);
-    drawText('SCORE', state.score, 12);
-    drawText('LINES', state.lines, 15);
-    drawText('FPS', state.performance.fps, 18);
-};
-
-const drawState = (state) => {
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
-
-    for (let y = 0; y < state.board.length; y++) {
-        for (let x = 0; x < state.board[y].length; x++) {
-            if (state.board[y][x] !== null) {
-
-                ctx.fillStyle = state.board[y][x];
-
-                // canvas 0,0 is top left, we need 0,0 to be bottom left and offset from edge like board
-                let actualX = (2 + x) * CONSTANTS.BLOCKSIZE;
-                let actualY = (CONSTANTS.BOARDHEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
-
-                drawBlock(actualX, actualY, CONSTANTS.BLOCKSIZE);
-            }
-        }
-    }
-};
-
-const clear = () => {
-    // FUTURE: only clear parts that get redrawn (game board and side bar)
-    ctx.clearRect(0, 0, canvas.height, canvas.width);
-};
-
 const updateState = (inputState) => {
     // TODO: handle pause here
     // TODO: update game state
@@ -133,6 +38,7 @@ const updateFPS = () => {
     state.performance.fps = state.performance.times.length;
 };
 
+// TODO: remove debug code
 state.board[0][0] = 'rgb(0, 0, 255)';
 state.board[0][9] = 'rgb(0, 0, 255)';
 state.board[10][0] = 'rgb(0, 255, 0)';
@@ -148,19 +54,11 @@ const update = (frameTimestamp) => {
     updateFPS();
 };
 
-const render = () => {
-    clear();
-    // FUTURE: only drawboard once and don't clear it (static)
-    drawBoard();
-    drawSideBar(state);
-    drawState(state);
-};
-
 (function run(frameTimestamp) {
     // TODO: capture return value from function to get abilty to stop animation (like setTimeout)
     window.requestAnimationFrame(run);
 
     update(frameTimestamp);
 
-    render();
+    render(state);
 })();

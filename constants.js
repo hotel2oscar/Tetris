@@ -1,0 +1,5 @@
+const CONSTANTS = {
+    BOARDWIDTH: 10,
+    BOARDHEIGHT: 20,
+    BLOCKSIZE: 20
+};
