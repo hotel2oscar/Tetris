@@ -23,6 +23,8 @@ class Keyboard {
 };
 
 class Gamepad {
+    // TODO: possibly improve this for performance reasons
+    // having trouble detecting button press at times
     static A = 0;
     static B = 1;
     static START = 9;
@@ -56,12 +58,6 @@ window.addEventListener("gamepadconnected", function (e) {
 let inputEnabled = true;
 
 const determineUserInput = () => {
-    if (inputEnabled == false) {
-        return;
-    }
-
-    let inputPressed = false;
-
     let inputState = {
         Up : false,
         Down : false,
@@ -71,6 +67,12 @@ const determineUserInput = () => {
         B : false,
         Start : false
     };
+
+    if (!inputEnabled) {
+        return inputState;
+    }
+
+    let inputPressed = false;
 
     if (Keyboard.isDown(Keyboard.A) || Gamepad.isDown(Gamepad.A)) {
         inputState.A = true;

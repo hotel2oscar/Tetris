@@ -18,19 +18,14 @@ const state = {
     lines: 0,
     board: initializeBoard(),
     performance: {
+        show: true,
         fps: 0,
         times: []
     },
-    paused: false
+    paused: true,
+    gameOver: true,
+    activeBlock: { x: 0, y: 0 }
 };
-
-// TODO: remove debug code
-state.board[0][0] = 'rgb(0, 0, 255)';
-state.board[0][9] = 'rgb(0, 0, 255)';
-state.board[10][0] = 'rgb(0, 255, 0)';
-state.board[10][9] = 'rgb(0, 255, 0)';
-state.board[19][0] = 'rgb(255, 0, 0)';
-state.board[19][9] = 'rgb(255, 0, 0)';
 
 (function run() {
     // TODO: capture return value from function to get abilty to stop animation (like setTimeout)

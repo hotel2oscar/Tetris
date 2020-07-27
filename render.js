@@ -63,23 +63,35 @@ const drawSideBar = (state) => {
     drawText('LEVEL', state.level, 9);
     drawText('SCORE', state.score, 12);
     drawText('LINES', state.lines, 15);
-    drawText('FPS', state.performance.fps, 18);
+
+    if (state.performance.show) {
+        drawText('FPS', state.performance.fps, 18);
+    }
 };
 
 const drawState = (state) => {
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
+    if (state.paused) {
+        ctx.fillText('PAUSED', 5 * CONSTANTS.BLOCKSIZE, 11 * CONSTANTS.BLOCKSIZE);
+        
+        ctx.fillText("PRESS START", 4 * CONSTANTS.BLOCKSIZE, 15 * CONSTANTS.BLOCKSIZE);
+        ctx.fillText("OR SPACE", 4 * CONSTANTS.BLOCKSIZE, 16 * CONSTANTS.BLOCKSIZE);
+        ctx.fillText("TO PLAY", 4 * CONSTANTS.BLOCKSIZE, 17 * CONSTANTS.BLOCKSIZE);
 
-    for (let y = 0; y < state.board.length; y++) {
-        for (let x = 0; x < state.board[y].length; x++) {
-            if (state.board[y][x] !== null) {
+    } else {
+        ctx.strokeStyle = 'rgb(0, 0, 0)';
 
-                ctx.fillStyle = state.board[y][x];
+        for (let y = 0; y < state.board.length; y++) {
+            for (let x = 0; x < state.board[y].length; x++) {
+                if (state.board[y][x] !== null) {
 
-                // canvas 0,0 is top left, we need 0,0 to be bottom left and offset from edge like board
-                let actualX = (2 + x) * CONSTANTS.BLOCKSIZE;
-                let actualY = (CONSTANTS.BOARDHEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
+                    ctx.fillStyle = state.board[y][x];
 
-                drawBlock(actualX, actualY, CONSTANTS.BLOCKSIZE);
+                    // canvas 0,0 is top left, we need 0,0 to be bottom left and offset from edge like board
+                    let actualX = (2 + x) * CONSTANTS.BLOCKSIZE;
+                    let actualY = (CONSTANTS.BOARDHEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
+
+                    drawBlock(actualX, actualY, CONSTANTS.BLOCKSIZE);
+                }
             }
         }
     }
