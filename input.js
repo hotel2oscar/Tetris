@@ -1,4 +1,4 @@
-class Key {
+class Keyboard {
     static _pressed = {};
 
     static SPACE = 32;
@@ -10,15 +10,15 @@ class Key {
     static DOWN = 40;
 
     static isDown(keyCode) {
-        return Key._pressed[keyCode];
+        return Keyboard._pressed[keyCode];
     }
 
     static onKeyDown(event) {
-        Key._pressed[event.keyCode] = true;
+        Keyboard._pressed[event.keyCode] = true;
     }
 
     static onKeyUp(event) {
-        Key._pressed[event.keyCode] = false;
+        Keyboard._pressed[event.keyCode] = false;
     }
 };
 
@@ -44,8 +44,8 @@ class Gamepad {
     }
 }
 
-window.addEventListener('keydown', (event) => Key.onKeyDown(event), false);
-window.addEventListener('keyup', (event) => Key.onKeyUp(event), false);
+window.addEventListener('keydown', (event) => Keyboard.onKeyDown(event), false);
+window.addEventListener('keyup', (event) => Keyboard.onKeyUp(event), false);
 
 window.addEventListener("gamepadconnected", function (e) {
     console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
@@ -60,86 +60,73 @@ const determineUserInput = () => {
         return;
     }
 
-    let input = false;
+    let inputPressed = false;
 
-    if (Key.isDown(Key.A)) {
-        input = true;
-        console.log("Key A is pressed");
+    let inputState = {
+        Up : false,
+        Down : false,
+        Left : false,
+        Right : false,
+        A: false,
+        B : false,
+        Start : false
+    };
+
+    if (Keyboard.isDown(Keyboard.A) || Gamepad.isDown(Gamepad.A)) {
+        inputState.A = true;
     }
 
-    if (Key.isDown(Key.B)) {
-        input = true;
-        console.log("Key B is pressed");
+    if (Keyboard.isDown(Keyboard.B) || Gamepad.isDown(Gamepad.B)) {
+        inputState.B = true;
     }
 
-    if (Key.isDown(Key.LEFT)) {
-        input = true;
-        console.log("Key LEFT is pressed");
+    if (Keyboard.isDown(Keyboard.LEFT) || Gamepad.isDown(Gamepad.LEFT)) {
+        inputState.Left = true;
     }
 
-    if (Key.isDown(Key.RIGHT)) {
-        input = true;
-        console.log("Key RIGHT is pressed");
+    if (Keyboard.isDown(Keyboard.RIGHT) || Gamepad.isDown(Gamepad.RIGHT)) {
+        inputState.Right = true;
     }
 
-    if (Key.isDown(Key.UP)) {
-        input = true;
-        console.log("Key UP is pressed");
+    if (Keyboard.isDown(Keyboard.UP) || Gamepad.isDown(Gamepad.UP)) {
+        inputState.Up = true;
     }
 
-    if (Key.isDown(Key.DOWN)) {
-        input = true;
-        console.log("Key DOWN is pressed");
+    if (Keyboard.isDown(Keyboard.DOWN) || Gamepad.isDown(Gamepad.DOWN)) {
+        inputState.Down = true;
     }
 
-    if (Key.isDown(Key.SPACE)) {
-        input = true;
-        console.log("Key SPACE is pressed");
+    if (Keyboard.isDown(Keyboard.SPACE) || Gamepad.isDown(Gamepad.START)) {
+        inputState.Start = true;
     }
 
-    if (Gamepad.isDown(Gamepad.A)) {
-        input = true;
-        console.log("Gamepad A is pressed");
+    if(inputState.Up && inputState.Down) {
+        inputState.Up = false;
+        inputState.Down = false;
     }
 
-    if (Gamepad.isDown(Gamepad.B)) {
-        input = true;
-        console.log("Gamepad B is pressed");
+    if(inputState.Left && inputState.Right) {
+        inputState.Left = false;
+        inputState.Right= false;
     }
 
-    if (Gamepad.isDown(Gamepad.LEFT)) {
-        input = true;
-        console.log("Gamepad LEFT is pressed");
+    if (inputState.A && inputState.B) {
+        inputState.A = false;
+        inputState.B = false;
     }
 
-    if (Gamepad.isDown(Gamepad.RIGHT)) {
-        input = true;
-        console.log("Gamepad RIGHT is pressed");
+    for (let input in inputState) {
+        if (inputState[input]) {
+            inputPressed = true;
+        }
     }
 
-    if (Gamepad.isDown(Gamepad.UP)) {
-        input = true;
-        console.log("Gamepad UP is pressed");
-    }
-
-    if (Gamepad.isDown(Gamepad.DOWN)) {
-        input = true;
-        console.log("Gamepad DOWN is pressed");
-    }
-
-    if (Gamepad.isDown(Gamepad.START)) {
-        input = true;
-        console.log("Gamepad START is pressed");
-    }
-
-    // TODO: cancel out opposite inputs (up - down; left - right; a - b)
-
-    if (input) {
+    if (inputPressed) {
         inputEnabled = false;
 
         // FUTURE: tweak timing for better performance
         setTimeout(() => inputEnabled = true, 100);
     }
 
-    // TODO: return input state
+    return inputState;
 };

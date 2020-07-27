@@ -32,7 +32,7 @@ const state = {
         fps: 0,
         times: []
     },
-    stop: undefined
+    paused: false
 };
 
 const drawBlock = (x, y, width) => {
@@ -157,7 +157,8 @@ const render = () => {
 };
 
 (function run(frameTimestamp) {
-    state.stop = window.requestAnimationFrame(run);
+    // TODO: capture return value from function to get abilty to stop animation (like setTimeout)
+    window.requestAnimationFrame(run);
 
     update(frameTimestamp);
 
