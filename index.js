@@ -28,11 +28,13 @@ const state = {
     board: initializeBoard(),
 };
 
+const UI = new UserInterface();
+
 (function run() {
     // TODO: capture return value from function to get abilty to stop animation (like setTimeout)
     window.requestAnimationFrame(run);
 
     update(state);
 
-    render(state);
+    UI.render(state);
 })();
