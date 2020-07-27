@@ -58,9 +58,7 @@ const updateFPS = (state) => {
     state.performance.fps = state.performance.times.length;
 };
 
-const update = (state) => {
-    let inputState = determineUserInput();
-
+const update = (inputState, state) => {
     updateState(inputState, state);
 
     updateFPS(state);

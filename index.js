@@ -1,8 +1,8 @@
 const initializeBoard = () => {
-    let board = new Array(CONSTANTS.BOARDHEIGHT);
+    let board = new Array(CONSTANTS.BOARD.HEIGHT);
 
     for (let i = 0; i < board.length; i++) {
-        board[i] = new Array(CONSTANTS.BOARDWIDTH);
+        board[i] = new Array(CONSTANTS.BOARD.WIDTH);
 
         for (let j = 0; j < board[i].length; j++) {
             board[i][j] = null;
@@ -28,13 +28,16 @@ const state = {
     board: initializeBoard(),
 };
 
-const UI = new UserInterface();
+const ui = new UserInterface();
+const controls = new Controls();
 
 (function run() {
-    // TODO: capture return value from function to get abilty to stop animation (like setTimeout)
+    // TODO: capture return value from function to get abilty to stop animation (like setTimeout)?
     window.requestAnimationFrame(run);
 
-    update(state);
+    let inputState = controls.determineUserInput();
 
-    UI.render(state);
+    update(inputState, state);
+
+    ui.render(state);
 })();

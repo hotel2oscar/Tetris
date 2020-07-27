@@ -28,8 +28,8 @@ class UserInterface {
         // TODO: use boardOffset
         let startX = CONSTANTS.BLOCKSIZE;
         let startY = CONSTANTS.BLOCKSIZE;
-        const EDGEWIDTH = CONSTANTS.BOARDWIDTH + 1;
-        const EDGEHEIGHT = CONSTANTS.BOARDHEIGHT + 1;
+        const EDGEWIDTH = CONSTANTS.BOARD.WIDTH + 1;
+        const EDGEHEIGHT = CONSTANTS.BOARD.HEIGHT + 1;
 
         this._ctx.fillStyle = 'rgb(82, 87, 94)';
         this._ctx.strokeStyle = 'rgb(53, 57, 61)';
@@ -101,7 +101,7 @@ class UserInterface {
 
                         // canvas 0,0 is top left, we need 0,0 to be bottom left and offset from edge like board
                         let actualX = (2 + x) * CONSTANTS.BLOCKSIZE;
-                        let actualY = (CONSTANTS.BOARDHEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
+                        let actualY = (CONSTANTS.BOARD.HEIGHT - y + 1) * CONSTANTS.BLOCKSIZE;
 
                         this._drawBlock(actualX, actualY, CONSTANTS.BLOCKSIZE);
                     }
