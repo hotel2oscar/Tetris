@@ -3,9 +3,18 @@ const CONSTANTS = {
         WIDTH: 10,
         HEIGHT: 20,
     },
+
     BLOCKSIZE: 25,
 
-    //TODO: color constants
+    DIRECTION: {
+        UP : 0,
+        DOWN : 1,
+        LEFT: 2,
+        RIGHT: 3,
+        CLOCKWISE : 4,
+        COUNTERCLOCKWISE : 5,
+    },
+
     COLORS: {
         // misc colors
         BLACK: 'rgb(0, 0, 0)',

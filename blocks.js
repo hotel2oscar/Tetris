@@ -1,18 +1,72 @@
 class Block {
     constructor(color) {
         this.color = color;
-        this._showNext();
+        this.done = false;
     }
 
-    _showNext() { throw new Error('not implemented'); }
+    setNext() { throw new Error('not implemented'); }
 
     spawn(board) { throw new Error('not implemented'); }
 
     move(board, direction) {
-        // 1. generate new coords (temp)
+        // 1. generate new coords
+        let newCoords = [];
+
+        switch (direction) {
+            case CONSTANTS.DIRECTION.DOWN:
+                for (let coord of this.coordinates) {
+                    board[coord.y][coord.x] = null;
+
+                    newCoords.push({ x: coord.x, y: coord.y - 1 });
+                }
+                break;
+            case CONSTANTS.DIRECTION.LEFT:
+                for (let coord of this.coordinates) {
+                    board[coord.y][coord.x] = null;
+
+                    newCoords.push({ x: coord.x - 1, y: coord.y });
+                }
+                break;
+            case CONSTANTS.DIRECTION.RIGHT:
+                for (let coord of this.coordinates) {
+                    board[coord.y][coord.x] = null;
+
+                    newCoords.push({ x: coord.x + 1, y: coord.y });
+                }
+                break;
+        }
+
         // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+        let blocked = false;
+        for (let coord of newCoords) {
+            // check edges
+            if (coord.x < 0 || coord.x === CONSTANTS.BOARD.WIDTH) {
+                blocked = true;
+            }
+
+            // check for another block
+            if (board[coord.y][coord.x] !== null) {
+                blocked = true;
+            }
+        }
+
+        // 3. update coords if not blocked
+        if (!blocked) {
+            this.coordinates = newCoords;
+        }
+
+        // 4. check for bottom
+        for (let coord of this.coordinates) {
+            board[coord.y][coord.x] = this.color;
+
+            if (coord.y === 0) {
+                blocked = true;
+            }
+        }
+
+        if (blocked && direction === CONSTANTS.DIRECTION.DOWN) {
+            this.done = true;
+        }
     }
 
     rotate(board, direction) { throw new Error('not implemented'); }
@@ -25,7 +79,7 @@ class IBlock extends Block {
 
     static generate() { return new IBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             { x: 2, y: 1 },
             { x: 2, y: 2 },
@@ -43,8 +97,14 @@ class IBlock extends Block {
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {
@@ -62,12 +122,11 @@ class JBlock extends Block {
 
     static generate() { return new JBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             /**          */ { x: 3, y: 4 },
             /**          */ { x: 3, y: 3 },
             { x: 2, y: 2 }, { x: 3, y: 2 },
-
         ];
     }
 
@@ -76,12 +135,17 @@ class JBlock extends Block {
             /**           */ { x: 4, y: 19 },
             /**           */ { x: 4, y: 18 },
             { x: 3, y: 17 }, { x: 4, y: 17 },
-
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {
@@ -99,12 +163,11 @@ class LBlock extends Block {
 
     static generate() { return new LBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             { x: 2, y: 4 },
             { x: 2, y: 3 },
             { x: 2, y: 2 }, { x: 3, y: 2 },
-
         ];
     }
 
@@ -113,12 +176,17 @@ class LBlock extends Block {
             { x: 4, y: 19 },
             { x: 4, y: 18 },
             { x: 4, y: 17 }, { x: 5, y: 17 },
-
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {
@@ -136,7 +204,7 @@ class OBlock extends Block {
 
     static generate() { return new OBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             { x: 2, y: 3 }, { x: 3, y: 3 },
             { x: 2, y: 2 }, { x: 3, y: 2 },
@@ -150,8 +218,14 @@ class OBlock extends Block {
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) { /** do nothing for this block */ }
@@ -164,11 +238,10 @@ class SBlock extends Block {
 
     static generate() { return new SBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             /**          */ { x: 2, y: 3 }, { x: 3, y: 3 },
             { x: 1, y: 2 }, { x: 2, y: 2 },
-
         ];
     }
 
@@ -176,12 +249,18 @@ class SBlock extends Block {
         this.coordinates = [
             /**           */ { x: 4, y: 19 }, { x: 5, y: 19 },
             { x: 3, y: 18 }, { x: 4, y: 18 },
-
         ];
 
         for (let coord of this.coordinates) {
+
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {
@@ -199,11 +278,10 @@ class TBlock extends Block {
 
     static generate() { return new TBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             /**          */ { x: 2, y: 3 },
             { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
-
         ];
     }
 
@@ -211,12 +289,17 @@ class TBlock extends Block {
         this.coordinates = [
             /**           */ { x: 4, y: 19 },
             { x: 3, y: 18 }, { x: 4, y: 18 }, { x: 5, y: 18 },
-
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {
@@ -234,11 +317,10 @@ class ZBlock extends Block {
 
     static generate() { return new ZBlock(); }
 
-    _showNext() {
+    setNext() {
         this.coordinates = [
             { x: 1, y: 3 }, { x: 2, y: 3 },
             /**          */ { x: 2, y: 2 }, { x: 3, y: 2 },
-
         ];
     }
 
@@ -246,12 +328,17 @@ class ZBlock extends Block {
         this.coordinates = [
             { x: 3, y: 19 }, { x: 4, y: 19 },
             /**           */ { x: 4, y: 18 }, { x: 5, y: 18 },
-
         ];
 
         for (let coord of this.coordinates) {
+            if (board[coord.y][coord.x] !== null) {
+                return false;
+            }
+
             board[coord.y][coord.x] = this.color;
         }
+
+        return true;
     }
 
     rotate(board, direction) {

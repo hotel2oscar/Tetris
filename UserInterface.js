@@ -130,7 +130,12 @@ class UserInterface {
         };
 
         if (state.paused) {
-            drawText('PAUSED', 3, 10);
+
+            if (state.gameOver) {
+                drawText('GAME OVER', 2, 10);
+            } else {
+                drawText('PAUSED', 3, 10);
+            }
 
             drawText('PRESS START', 2, 7);
             drawText('(OR SPACE)', 2, 6);
@@ -160,4 +165,3 @@ class UserInterface {
         this._drawState(state);
     };
 }
-
