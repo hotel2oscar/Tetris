@@ -20,7 +20,7 @@ class Game {
                 if (!this.state.paused) { this.state.time++; }
             }, 1000),
             gravity: setInterval(() => {
-                if (!this.state.paused) { this._moveBlock(CONSTANTS.DIRECTION.DOWN); }
+                // if (!this.state.paused) { this._moveBlock(CONSTANTS.DIRECTION.DOWN); }
             }, this._gravityTime)
         }
     }

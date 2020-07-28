@@ -152,14 +152,8 @@ class Controls {
         if (inputPressed) {
             this._inputEnabled = false;
 
-            // console.log('input disabled');
-
             // FUTURE: tweak timing for better performance
-            setTimeout(() => {
-                this._inputEnabled = true;
-                // console.log('input enabled');
-                // console.log();
-            }, 125);
+            setTimeout(() => { this._inputEnabled = true; }, 125);
         }
 
         controlInput.rotation = this._convertInputToRotation(inputState);
