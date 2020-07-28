@@ -158,7 +158,7 @@ class Controls {
             setTimeout(() => {
                 this._inputEnabled = true;
                 // console.log('input enabled');
-                console.log();
+                // console.log();
             }, 125);
         }
 

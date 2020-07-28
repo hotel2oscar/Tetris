@@ -19,8 +19,8 @@ class Game {
             game: setInterval(() => {
                 if (!this.state.paused) { this.state.time++; }
             }, 1000),
-            garvity: setInterval(() => {
-                if (!this.state.paused) { }
+            gravity: setInterval(() => {
+                if (!this.state.paused) { this._moveBlock(CONSTANTS.DIRECTION.DOWN); }
             }, this._gravityTime)
         }
     }
@@ -120,7 +120,14 @@ class Game {
         }
         else {
             // this.state.block.active.rotate(this.state.board, controlInput.rotation);
-            this.state.block.active.move(this.state.board, controlInput.direction);
+            // this.state.block.active.move(this.state.board, controlInput.direction);
+            this._moveBlock(controlInput.direction);
+        }
+    }
+
+    _moveBlock(direction) {
+        if (this.state.block.active !== null && !this.state.block.active.done) {
+            this.state.block.active.move(this.state.board, direction);
         }
     }
 
