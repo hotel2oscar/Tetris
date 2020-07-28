@@ -13,60 +13,105 @@ class Block {
         let newCoords = [];
 
         switch (direction) {
+            case CONSTANTS.DIRECTION.UP:
+                while (!this.done) {
+                    this.move(board, CONSTANTS.DIRECTION.DOWN);
+                 };
+                return;
             case CONSTANTS.DIRECTION.DOWN:
                 for (let coord of this.coordinates) {
-                    board[coord.y][coord.x] = null;
-
                     newCoords.push({ x: coord.x, y: coord.y - 1 });
                 }
                 break;
             case CONSTANTS.DIRECTION.LEFT:
                 for (let coord of this.coordinates) {
-                    board[coord.y][coord.x] = null;
-
                     newCoords.push({ x: coord.x - 1, y: coord.y });
                 }
                 break;
             case CONSTANTS.DIRECTION.RIGHT:
                 for (let coord of this.coordinates) {
-                    board[coord.y][coord.x] = null;
-
                     newCoords.push({ x: coord.x + 1, y: coord.y });
                 }
                 break;
+            default: return;
         }
 
-        // 2. check for collison (edge or existing block)
+        // 2 Get delta between existing and new
+        let delta = this._delta(newCoords);
+
+        // 3. check for collison (edge or existing block)
         let blocked = false;
-        for (let coord of newCoords) {
+        for (let coord of delta.add) {
             // check edges
-            if (coord.x < 0 || coord.x === CONSTANTS.BOARD.WIDTH) {
+            if (coord.x < 0 || coord.x === CONSTANTS.BOARD.WIDTH || coord.y < 0) {
                 blocked = true;
+                break;
             }
 
             // check for another block
             if (board[coord.y][coord.x] !== null) {
                 blocked = true;
+                break;
             }
         }
 
-        // 3. update coords if not blocked
+        // 4. move block if not blocked
         if (!blocked) {
-            this.coordinates = newCoords;
+            this._move(board, delta, newCoords);
         }
 
-        // 4. check for bottom
-        for (let coord of this.coordinates) {
-            board[coord.y][coord.x] = this.color;
-
-            if (coord.y === 0) {
-                blocked = true;
-            }
-        }
-
+        // 5. Check if block is done (no longer able to move down)
         if (blocked && direction === CONSTANTS.DIRECTION.DOWN) {
             this.done = true;
         }
+    }
+
+    _delta(newCoords) {
+        let delta = { add: [], remove: [] };
+
+        for (let newCoord of newCoords) {
+            let isNew = true;
+
+            for (let oldCoord of this.coordinates) {
+                if (newCoord.x === oldCoord.x && newCoord.y === oldCoord.y) {
+                    isNew = false;
+                    break;
+                }
+            }
+
+            if (isNew) {
+                delta.add.push(newCoord);
+            }
+        }
+
+        for (let oldCoord of this.coordinates) {
+            let isRemove = true;
+
+            for (let newCoord of newCoords) {
+                if (oldCoord.x === newCoord.x && oldCoord.y === newCoord.y) {
+                    isRemove = false;
+                    break;
+                }
+            }
+
+            if (isRemove) {
+                delta.remove.push(oldCoord);
+            }
+        }
+
+        return delta;
+    }
+
+    _move(board, delta, newCoords) {
+        for (let coord of delta.remove) {
+            board[coord.y][coord.x] = null;
+        }
+
+        for (let coord of delta.add) {
+            board[coord.y][coord.x] = this.color;
+        }
+
+        this.coordinates = newCoords;
     }
 
     rotate(board, direction) { throw new Error('not implemented'); }

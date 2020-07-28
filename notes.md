@@ -9,3 +9,4 @@ each space in block will have either `null` or a color (`rgb(#,#,#)`) in it
 ## Misc
 Press `Start (Space)` to begin
 
+To block coordinates as offset from (0, 0), have game / render determine exact placement on screen

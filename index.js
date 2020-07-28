@@ -6,7 +6,9 @@ const controls = new Controls();
     // TODO: capture return value from function to get abilty to stop animation (like setTimeout)?
     window.requestAnimationFrame(run);
 
-    game.update(controls.determineUserInput());
+    let controlInput = controls.determineUserInput();
+
+    game.update(controlInput);
 
     ui.render(game.state);
 })();

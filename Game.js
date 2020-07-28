@@ -18,9 +18,14 @@ class Game {
         this._timers = {
             game: setInterval(() => {
                 if (!this.state.paused) { this.state.time++; }
-            }, 1000)
+            }, 1000),
+            garvity: setInterval(() => {
+                if (!this.state.paused) { }
+            }, this._gravityTime)
         }
     }
+
+    get _gravityTime() { return 1000 - this.state.level * 10; }
 
     _initializeBoard() {
         this.state.board = new Array(CONSTANTS.BOARD.HEIGHT);
@@ -93,8 +98,8 @@ class Game {
         this.state.block.next.setNext();
     }
 
-    _updateState(inputState) {
-        if (inputState.Start) {
+    _updateState(controlInput) {
+        if (controlInput.start) {
             this.state.paused = !this.state.paused;
 
             if (this.state.gameOver) {
@@ -109,18 +114,13 @@ class Game {
         }
 
         if (this.state.block.active === null || this.state.block.active.done) {
+            // TODO: check for complete row
+
             this._nextPiece();
         }
         else {
-            if (inputState.Down ) {
-                this.state.block.active.move(this.state.board, CONSTANTS.DIRECTION.DOWN);
-            }
-            if (inputState.Left ) {
-                this.state.block.active.move(this.state.board, CONSTANTS.DIRECTION.LEFT);
-            }
-            if (inputState.Right ) {
-                this.state.block.active.move(this.state.board, CONSTANTS.DIRECTION.RIGHT);
-            }
+            // this.state.block.active.rotate(this.state.board, controlInput.rotation);
+            this.state.block.active.move(this.state.board, controlInput.direction);
         }
     }
 
@@ -135,8 +135,8 @@ class Game {
         this.state.performance.fps = this._fpsTimes.length;
     }
 
-    update(inputState) {
-        this._updateState(inputState);
+    update(controlInput) {
+        this._updateState(controlInput);
 
         this._updateFPS();
     }

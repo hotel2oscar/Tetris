@@ -10,16 +10,16 @@ class Keyboard {
     static RIGHT = 39;
     static DOWN = 40;
 
-    static isDown(keyCode) {
-        return Keyboard._pressed[keyCode];
+    static isDown(key) {
+        return Keyboard._pressed[key];
     }
 
-    static onKeyDown(event) {
-        Keyboard._pressed[event.keyCode] = true;
+    static onKeyDown(key) {
+        Keyboard._pressed[key] = true;
     }
 
-    static onKeyUp(event) {
-        Keyboard._pressed[event.keyCode] = false;
+    static onKeyUp(key) {
+        Keyboard._pressed[key] = false;
     }
 };
 
@@ -37,7 +37,7 @@ class Gamepad {
     static isDown(buttonCode) {
         var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 
-        if(gamepads.length === 0) return false;
+        if (gamepads.length === 0) return false;
 
         let gamepad = gamepads[0];
 
@@ -49,10 +49,32 @@ class Gamepad {
 
 class Controls {
     constructor() {
-        window.addEventListener('keydown', (event) => Keyboard.onKeyDown(event), false);
-        window.addEventListener('keyup', (event) => Keyboard.onKeyUp(event), false);
+        window.addEventListener('keydown', (event) => {
+            Keyboard.onKeyDown(event.keyCode);
+            // console.log(`${performance.now()} : key down ${event.keyCode}`)
+        }, false);
+        window.addEventListener('keyup', (event) => {
+            Keyboard.onKeyUp(event.keyCode);
+            // console.log(`${performance.now()} : key up ${event.keyCode}`)
+        }, false);
 
         this._inputEnabled = true;
+    }
+
+    _convertInputToDirection(inputState) {
+        if (inputState.Left) return CONSTANTS.DIRECTION.LEFT;
+        if (inputState.Right) return CONSTANTS.DIRECTION.RIGHT;
+        if (inputState.Up) return CONSTANTS.DIRECTION.UP;
+        if (inputState.Down) return CONSTANTS.DIRECTION.DOWN;
+
+        return CONSTANTS.DIRECTION.NONE;
+    }
+
+    _convertInputToRotation(inputState) {
+        if (inputState.A) return CONSTANTS.DIRECTION.CLOCKWISE;
+        if (inputState.B) return CONSTANTS.DIRECTION.COUNTERCLOCKWISE;
+
+        return CONSTANTS.DIRECTION.NONE;
     }
 
     determineUserInput() {
@@ -63,11 +85,17 @@ class Controls {
             Right: false,
             A: false,
             B: false,
-            Start: false
+            Start: false,
+        };
+
+        let controlInput = {
+            rotation: CONSTANTS.DIRECTION.NONE,
+            direction: CONSTANTS.DIRECTION.NONE,
+            start: false,
         };
 
         if (!this._inputEnabled) {
-            return inputState;
+            return controlInput;
         }
 
         let inputPressed = false;
@@ -124,10 +152,20 @@ class Controls {
         if (inputPressed) {
             this._inputEnabled = false;
 
+            // console.log('input disabled');
+
             // FUTURE: tweak timing for better performance
-            setTimeout(() => this._inputEnabled = true, 100);
+            setTimeout(() => {
+                this._inputEnabled = true;
+                // console.log('input enabled');
+                console.log();
+            }, 125);
         }
 
-        return inputState;
+        controlInput.rotation = this._convertInputToRotation(inputState);
+        controlInput.direction = this._convertInputToDirection(inputState);
+        controlInput.start = inputState.Start;
+
+        return controlInput;
     }
 }

@@ -7,12 +7,13 @@ const CONSTANTS = {
     BLOCKSIZE: 25,
 
     DIRECTION: {
-        UP : 0,
-        DOWN : 1,
-        LEFT: 2,
-        RIGHT: 3,
-        CLOCKWISE : 4,
-        COUNTERCLOCKWISE : 5,
+        NONE: 0,
+        UP : 1,
+        DOWN : 2,
+        LEFT: 4,
+        RIGHT: 8,
+        CLOCKWISE : 16,
+        COUNTERCLOCKWISE : 32,
     },
 
     COLORS: {
