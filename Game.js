@@ -19,24 +19,28 @@ class Game {
         this._initializeState();
 
         this._timers = {
-            game: setInterval(() => {
+            time: setInterval(() => {
                 if (!this.state.paused) { this.state.time++; }
             }, 1000),
-            gravity: setInterval(() => {
-                if (!this.state.paused) {
-                    if (this.state.block.active !== null) {
-                        var moved = this._moveBlock(CONSTANTS.DIRECTION.DOWN);
-
-                        if (moved === false) {
-                            this._finishBlock();
-                        }
-                    }
-                }
-            }, this._gravityTime)
+            gravity: this._startGravity()
         }
     }
 
     get _gravityTime() { return 1000 - this.state.level * 10; }
+
+    _startGravity() {
+        return setInterval(() => {
+            if (!this.state.paused) {
+                if (this.state.block.active !== null) {
+                    var moved = this._moveBlock(CONSTANTS.DIRECTION.DOWN);
+
+                    if (moved === false) {
+                        this._finishBlock();
+                    }
+                }
+            }
+        }, this._gravityTime);
+    }
 
     _initializeBoard() {
         this.state.board = new Array(CONSTANTS.BOARD.HEIGHT);
@@ -49,7 +53,7 @@ class Game {
     _addRow() {
         let row = new Array(CONSTANTS.BOARD.WIDTH);
 
-        for(let i = 0; i < row.length; i++) {
+        for (let i = 0; i < row.length; i++) {
             row[i] = null;
         }
 
@@ -188,15 +192,22 @@ class Game {
 
         this.state.block.active = null;
 
-        this._checkForFinishedRows();
+        let lines = this._checkForFinishedLines();
+
+        if (lines > 0) {
+            this._updateScore(lines);
+            this._updateLines(lines);
+        }
     }
 
-    _checkForFinishedRows() {
-        for(let y = 0; y < this.state.board.length; y++) {
+    _checkForFinishedLines() {
+        let lines = 0;
+
+        for (let y = 0; y < this.state.board.length; y++) {
             let row = this.state.board[y];
 
             let full = true;
-            for(let x = 0; x < row.length; x++) {
+            for (let x = 0; x < row.length; x++) {
                 if (row[x] === null) {
                     full = false;
                 }
@@ -204,8 +215,31 @@ class Game {
 
             if (full) {
                 this.state.board.splice(y--, 1);
+                lines++;
                 this.state.board.push(this._addRow());
             }
+        }
+
+        return lines;
+    }
+
+    _updateScore(lines) {
+        switch (lines) {
+            case 1: this.state.score += 100; break;
+            case 2: this.state.score += 250; break;
+            case 3: this.state.score += 500; break;
+            case 4: this.state.score += 800; break;
+        }
+    }
+
+    _updateLines(lines) {
+        this.state.lines += lines;
+
+        if (Math.floor(this.state.lines / 10) > this.state.level) {
+            this.state.level++;
+
+            clearTimeout(this._timers.gravity);
+            this._timers.gravity = this._startGravity();
         }
     }
 
