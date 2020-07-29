@@ -31,7 +31,7 @@ class Game {
     _startGravity() {
         let gravityTime = this._gravityTime;
 
-        console.log(`gravityTime: ${gravityTime}`);
+        // console.log(`gravityTime: ${gravityTime}`);
 
         return setInterval(() => {
             if (!this.state.paused) {
