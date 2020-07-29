@@ -158,7 +158,7 @@ class Controls {
         // shift has precedence over rotate
         let direction = this._convertInputToShift(inputState);
 
-        if (direction !== CONSTANTS.DIRECTION.NONE) {
+        if (direction === CONSTANTS.DIRECTION.NONE) {
             direction = this._convertInputToRotation(inputState);
         }
 

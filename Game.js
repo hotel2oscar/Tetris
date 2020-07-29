@@ -23,7 +23,15 @@ class Game {
                 if (!this.state.paused) { this.state.time++; }
             }, 1000),
             gravity: setInterval(() => {
-                // if (!this.state.paused) { this._moveBlock(CONSTANTS.DIRECTION.DOWN); }
+                if (!this.state.paused) {
+                    if (this.state.block.active !== null) {
+                        var moved = this._moveBlock(CONSTANTS.DIRECTION.DOWN);
+
+                        if (moved === false) {
+                            this._finishBlock();
+                        }
+                    }
+                }
             }, this._gravityTime)
         }
     }
@@ -34,12 +42,18 @@ class Game {
         this.state.board = new Array(CONSTANTS.BOARD.HEIGHT);
 
         for (let i = 0; i < this.state.board.length; i++) {
-            this.state.board[i] = new Array(CONSTANTS.BOARD.WIDTH);
-
-            for (let j = 0; j < this.state.board[i].length; j++) {
-                this.state.board[i][j] = null;
-            }
+            this.state.board[i] = this._addRow();
         }
+    }
+
+    _addRow() {
+        let row = new Array(CONSTANTS.BOARD.WIDTH);
+
+        for(let i = 0; i < row.length; i++) {
+            row[i] = null;
+        }
+
+        return row;
     }
 
     _initializeState() {
@@ -94,7 +108,7 @@ class Game {
 
             this.state.block.active.anchor = this._spawnPoint;
 
-            if(this._collision(this.state.block.active)) {
+            if (this._collision(this.state.block.active)) {
                 this.state.gameOver = true;
                 this.state.paused = true;
             }
@@ -105,7 +119,14 @@ class Game {
     }
 
     _collision(block) {
-        for(let coordinate of block.coordinates) {
+        for (let coordinate of block.coordinates) {
+            // edge detection
+            if (coordinate.x < 0 || coordinate.x === CONSTANTS.BOARD.WIDTH ||
+                coordinate.y < 0 || coordinate.y === CONSTANTS.BOARD.HEIGHT) {
+                return true;
+            }
+
+            // another block
             if (this.state.board[coordinate.y][coordinate.x] !== null) {
                 return true;
             }
@@ -129,19 +150,62 @@ class Game {
             return;
         }
 
-        // if (this.state.block.active === null) {
-        //     this._nextPiece();
-        // }
-        // else {
-        //     let newBlock = this.state.block.active.move(controlInput.direction);
+        if (this.state.block.active === null) {
+            this._nextPiece();
+        }
+        else {
+            if (controlInput.direction === CONSTANTS.DIRECTION.UP) {
+                while (this._moveBlock(CONSTANTS.DIRECTION.DOWN)) { }
+                this._finishBlock();
+            }
+            else {
+                let moved = this._moveBlock(controlInput.direction);
 
-
-        // }
+                if (!moved && controlInput.direction === CONSTANTS.DIRECTION.DOWN) {
+                    this._finishBlock();
+                }
+            }
+        }
     }
 
     _moveBlock(direction) {
-        if (this.state.block.active !== null && !this.state.block.active.done) {
-            this.state.block.active.move(this.state.board, direction);
+        let newBlock = this.state.block.active.move(direction);
+
+        if (!this._collision(newBlock)) {
+            this.state.block.active = newBlock;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    _finishBlock() {
+        let block = this.state.block.active;
+
+        for (let coordinate of block.coordinates) {
+            this.state.board[coordinate.y][coordinate.x] = block.color;
+        }
+
+        this.state.block.active = null;
+
+        this._checkForFinishedRows();
+    }
+
+    _checkForFinishedRows() {
+        for(let y = 0; y < this.state.board.length; y++) {
+            let row = this.state.board[y];
+
+            let full = true;
+            for(let x = 0; x < row.length; x++) {
+                if (row[x] === null) {
+                    full = false;
+                }
+            }
+
+            if (full) {
+                this.state.board.splice(y--, 1);
+                this.state.board.push(this._addRow());
+            }
         }
     }
 
