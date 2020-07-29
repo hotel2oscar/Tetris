@@ -10,6 +10,9 @@ class Game {
             ZBlock.generate,
         ];
 
+        this._spawnPoint = { x: 5, y: 19 };
+        this._nextPoint = { x: 3, y: 3 };
+
         this._bag = [];
         this._fpsTimes = [];
 
@@ -73,8 +76,8 @@ class Game {
     }
 
     _generateNewBag() {
-        for (let type of this._blockTypes) {
-            this._bag.push(type());
+        for (let generateBlock of this._blockTypes) {
+            this._bag.push(generateBlock(this._nextPoint));
         }
 
         Game._shuffle(this._bag);
@@ -88,14 +91,27 @@ class Game {
         // next -> active
         if (this.state.block.next !== null) {
             this.state.block.active = this.state.block.next;
-            if (!this.state.block.active.spawn(this.state.board)) {
+
+            this.state.block.active.anchor = this._spawnPoint;
+
+            if(this._collision(this.state.block.active)) {
                 this.state.gameOver = true;
                 this.state.paused = true;
             }
         }
+
         // bag -> next
         this.state.block.next = this._bag.shift();
-        this.state.block.next.setNext();
+    }
+
+    _collision(block) {
+        for(let coordinate of block.coordinates) {
+            if (this.state.board[coordinate.y][coordinate.x] !== null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _updateState(controlInput) {
@@ -113,16 +129,14 @@ class Game {
             return;
         }
 
-        if (this.state.block.active === null || this.state.block.active.done) {
-            // TODO: check for complete row
+        // if (this.state.block.active === null) {
+        //     this._nextPiece();
+        // }
+        // else {
+        //     let newBlock = this.state.block.active.move(controlInput.direction);
 
-            this._nextPiece();
-        }
-        else {
-            // this.state.block.active.rotate(this.state.board, controlInput.rotation);
-            // this.state.block.active.move(this.state.board, controlInput.direction);
-            this._moveBlock(controlInput.direction);
-        }
+
+        // }
     }
 
     _moveBlock(direction) {

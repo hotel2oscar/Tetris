@@ -154,6 +154,16 @@ class UserInterface {
                     }
                 }
             }
+
+            if(state.block.active !== null) {
+                this._ctx.fillStyle = state.block.active.color
+                
+                for(let coordinate of state.block.active.coordinates) {
+                    let position = convertCoordinates(coordinate.x, coordinate.y);
+
+                    this._drawBlock(position.x, position.y);
+                }
+            }
         }
     }
 

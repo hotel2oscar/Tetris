@@ -8,12 +8,12 @@ const CONSTANTS = {
 
     DIRECTION: {
         NONE: 0,
-        UP : 1,
-        DOWN : 2,
+        UP: 1,
+        DOWN: 2,
         LEFT: 4,
         RIGHT: 8,
-        CLOCKWISE : 16,
-        COUNTERCLOCKWISE : 32,
+        CLOCKWISE: 16,
+        COUNTERCLOCKWISE: 32,
     },
 
     COLORS: {
@@ -22,9 +22,9 @@ const CONSTANTS = {
         GREY: 'rgb(82, 87, 94)',
         DARKGREY: 'rgb(53, 57, 61)',
         // block colors
-        ORANGE: 'rgb(235, 171, 52)',
         CYAN: 'rgb(38, 234, 237)',
         BLUE: 'rgb(0, 0, 255)',
+        ORANGE: 'rgb(235, 171, 52)',
         YELLOW: 'rgb(240, 240, 12)',
         GREEN: 'rgb(3, 252, 65)',
         PURPLE: 'rgb(198, 0, 247)',
