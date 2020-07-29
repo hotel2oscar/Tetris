@@ -1,395 +1,276 @@
 class Block {
-    constructor(color) {
-        this.color = color;
-        this.done = false;
+    constructor(anchor, color, offsets) {
+        this._anchor = anchor;
+        this._color = color;
+        this._offsets = offsets;
+        this._orientation = 0;
     }
 
-    setNext() { throw new Error('not implemented'); }
+    set anchor(newAnchor) {
+        this._anchor = { x: newAnchor.x, y: newAnchor.y };
+    }
 
-    spawn(board) { throw new Error('not implemented'); }
+    get coordinates() {
+        let coordinates = [];
 
-    move(board, direction) {
-        // 1. generate new coords
-        let newCoords = [];
+        for (let offset of this._offsets[this._orientation]) {
+            coordinates.push({ x: this._anchor.x + offset.x, y: this._anchor.y + offset.y });
+        }
+
+        return coordinates;
+    }
+
+    get color() { return this._color; }
+
+    _clone(anchor, orientation) {
+        return this._cloneType(anchor, orientation);
+    }
+
+    _cloneType(anchor, orientation) { throw new Error('not implemented'); }
+
+    move(direction) {
+        let newAnchor = this._shift(direction);
+        let newOrientation = this._rotate(direction);
+
+        return this._clone(newAnchor, newOrientation);
+    }
+
+    _shift(direction) {
+        switch (direction) {
+            case CONSTANTS.DIRECTION.DOWN:
+                return { x: this._anchor.x, y: this._anchor.y - 1 };
+            case CONSTANTS.DIRECTION.LEFT:
+                return { x: this._anchor.x - 1, y: this._anchor.y };
+            case CONSTANTS.DIRECTION.RIGHT:
+                return { x: this._anchor.x + 1, y: this._anchor.y };
+            default: return this._anchor;
+        }
+    }
+
+    _rotate(direction) {
+        let newOrientation = this._orientation;
 
         switch (direction) {
-            case CONSTANTS.DIRECTION.UP:
-                while (!this.done) {
-                    this.move(board, CONSTANTS.DIRECTION.DOWN);
-                 };
-                return;
-            case CONSTANTS.DIRECTION.DOWN:
-                for (let coord of this.coordinates) {
-                    newCoords.push({ x: coord.x, y: coord.y - 1 });
+            case CONSTANTS.DIRECTION.CLOCKWISE:
+                newOrientation += 1;
+
+                if (newOrientation === 4) {
+                    newOrientation = 0;
                 }
                 break;
-            case CONSTANTS.DIRECTION.LEFT:
-                for (let coord of this.coordinates) {
-                    newCoords.push({ x: coord.x - 1, y: coord.y });
+            case CONSTANTS.DIRECTION.COUNTERCLOCKWISE:
+                newOrientation -= 1;
+
+                if (newOrientation === -1) {
+                    newOrientation = 3;
                 }
                 break;
-            case CONSTANTS.DIRECTION.RIGHT:
-                for (let coord of this.coordinates) {
-                    newCoords.push({ x: coord.x + 1, y: coord.y });
-                }
-                break;
-            default: return;
         }
 
-        // 2 Get delta between existing and new
-        let delta = this._delta(newCoords);
-
-        // 3. check for collison (edge or existing block)
-        let blocked = false;
-        for (let coord of delta.add) {
-            // check edges
-            if (coord.x < 0 || coord.x === CONSTANTS.BOARD.WIDTH || coord.y < 0) {
-                blocked = true;
-                break;
-            }
-
-            // check for another block
-            if (board[coord.y][coord.x] !== null) {
-                blocked = true;
-                break;
-            }
-        }
-
-        // 4. move block if not blocked
-        if (!blocked) {
-            this._move(board, delta, newCoords);
-        }
-
-        // 5. Check if block is done (no longer able to move down)
-        if (blocked && direction === CONSTANTS.DIRECTION.DOWN) {
-            this.done = true;
-        }
+        return newOrientation;
     }
 
-    _delta(newCoords) {
-        let delta = { add: [], remove: [] };
+    static nextOffset(offset, update) {
+        let nextOffset = [];
 
-        for (let newCoord of newCoords) {
-            let isNew = true;
-
-            for (let oldCoord of this.coordinates) {
-                if (newCoord.x === oldCoord.x && newCoord.y === oldCoord.y) {
-                    isNew = false;
-                    break;
-                }
-            }
-
-            if (isNew) {
-                delta.add.push(newCoord);
-            }
+        for (let o of offset) {
+            nextOffset.push(update(o));
         }
 
-        for (let oldCoord of this.coordinates) {
-            let isRemove = true;
-
-            for (let newCoord of newCoords) {
-                if (oldCoord.x === newCoord.x && oldCoord.y === newCoord.y) {
-                    isRemove = false;
-                    break;
-                }
-            }
-
-            if (isRemove) {
-                delta.remove.push(oldCoord);
-            }
-        }
-
-        return delta;
+        return nextOffset;
     }
-
-    _move(board, delta, newCoords) {
-        for (let coord of delta.remove) {
-            board[coord.y][coord.x] = null;
-        }
-
-        for (let coord of delta.add) {
-            board[coord.y][coord.x] = this.color;
-        }
-
-        this.coordinates = newCoords;
-    }
-
-    rotate(board, direction) { throw new Error('not implemented'); }
 }
 
 class IBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.CYAN);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.CYAN, IBlock._offsets);
     }
 
-    static generate() { return new IBlock(); }
+    static get _offsets() {
+        let index = 0;
+        let offsets = [[{ x: -2, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            { x: 2, y: 1 },
-            { x: 2, y: 2 },
-            { x: 2, y: 3 },
-            { x: 2, y: 4 },
-        ];
-    }
-
-    spawn(board) {
-        this.coordinates = [
-            { x: 4, y: 19 },
-            { x: 4, y: 18 },
-            { x: 4, y: 17 },
-            { x: 4, y: 16 },
+        let updates = [
+            (o) => { return { x: o.y, y: o.x } },
+            (o) => { return { x: o.y, y: o.x - 1 } },
+            (o) => { return { x: o.y, y: o.x } },
         ];
 
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let update of updates) {
+            offsets.push(Block.nextOffset(offsets[index++], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new IBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new IBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }
 
 class JBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.BLUE);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.BLUE, JBlock._offsets);
     }
 
-    static generate() { return new JBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: 1, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 0 }, { x: -1, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            /**          */ { x: 3, y: 4 },
-            /**          */ { x: 3, y: 3 },
-            { x: 2, y: 2 }, { x: 3, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.y, y: -1 * o.x } };
 
-    spawn(board) {
-        this.coordinates = [
-            /**           */ { x: 4, y: 19 },
-            /**           */ { x: 4, y: 18 },
-            { x: 3, y: 17 }, { x: 4, y: 17 },
-        ];
-
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new JBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new JBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }
 
 class LBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.ORANGE);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.ORANGE, LBlock._offsets);
     }
 
-    static generate() { return new LBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: -1, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            { x: 2, y: 4 },
-            { x: 2, y: 3 },
-            { x: 2, y: 2 }, { x: 3, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.y, y: -1 * o.x } };
 
-    spawn(board) {
-        this.coordinates = [
-            { x: 4, y: 19 },
-            { x: 4, y: 18 },
-            { x: 4, y: 17 }, { x: 5, y: 17 },
-        ];
-
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new LBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new LBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }
 
 class OBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.YELLOW);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.YELLOW, OBlock._offsets);
     }
 
-    static generate() { return new OBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: -1, y: -1 }, { x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            { x: 2, y: 3 }, { x: 3, y: 3 },
-            { x: 2, y: 2 }, { x: 3, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.x, y: o.y } };
 
-    spawn(board) {
-        this.coordinates = [
-            { x: 4, y: 19 }, { x: 5, y: 19 },
-            { x: 4, y: 18 }, { x: 5, y: 18 },
-        ];
-
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) { /** do nothing for this block */ }
+    static generate(anchor) { return new OBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new OBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
+    }
 }
 
 class SBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.GREEN);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.GREEN, SBlock._offsets);
     }
 
-    static generate() { return new SBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: -1 }, { x: -1, y: -1 }]];
 
-    setNext() {
-        this.coordinates = [
-            /**          */ { x: 2, y: 3 }, { x: 3, y: 3 },
-            { x: 1, y: 2 }, { x: 2, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.y, y: -1 * o.x } };
 
-    spawn(board) {
-        this.coordinates = [
-            /**           */ { x: 4, y: 19 }, { x: 5, y: 19 },
-            { x: 3, y: 18 }, { x: 4, y: 18 },
-        ];
-
-        for (let coord of this.coordinates) {
-
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new SBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new SBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }
 
 class TBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.PURPLE);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.PURPLE, TBlock._offsets);
     }
 
-    static generate() { return new TBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            /**          */ { x: 2, y: 3 },
-            { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.y, y: -1 * o.x } };
 
-    spawn(board) {
-        this.coordinates = [
-            /**           */ { x: 4, y: 19 },
-            { x: 3, y: 18 }, { x: 4, y: 18 }, { x: 5, y: 18 },
-        ];
-
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new TBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new TBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }
 
 class ZBlock extends Block {
-    constructor() {
-        super(CONSTANTS.COLORS.RED);
+    constructor(anchor) {
+        super(anchor, CONSTANTS.COLORS.RED, ZBlock._offsets);
     }
 
-    static generate() { return new ZBlock(); }
+    static get _offsets() {
+        let offsets = [[{ x: 1, y: -1 }, { x: 0, y: -1 }, { x: 0, y: 0 }, { x: -1, y: 0 }]];
 
-    setNext() {
-        this.coordinates = [
-            { x: 1, y: 3 }, { x: 2, y: 3 },
-            /**          */ { x: 2, y: 2 }, { x: 3, y: 2 },
-        ];
-    }
+        let update = (o) => { return { x: o.y, y: -1 * o.x } };
 
-    spawn(board) {
-        this.coordinates = [
-            { x: 3, y: 19 }, { x: 4, y: 19 },
-            /**           */ { x: 4, y: 18 }, { x: 5, y: 18 },
-        ];
-
-        for (let coord of this.coordinates) {
-            if (board[coord.y][coord.x] !== null) {
-                return false;
-            }
-
-            board[coord.y][coord.x] = this.color;
+        for (let i = 0; i < 3; i++) {
+            offsets.push(Block.nextOffset(offsets[i], update));
         }
 
-        return true;
+        return offsets;
     }
 
-    rotate(board, direction) {
-        // 1. generate new coords (temp)
-        // 2. check for collison (edge or existing block)
-        // 3. delete existing coords
-        // 4. set new coords
+    static generate(anchor) { return new ZBlock(anchor); }
+
+    _cloneType(anchor, orientation) {
+        let newBlock = new ZBlock(anchor);
+        newBlock._orientation = orientation;
+
+        return newBlock;
     }
 }

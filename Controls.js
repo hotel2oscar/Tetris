@@ -61,7 +61,7 @@ class Controls {
         this._inputEnabled = true;
     }
 
-    _convertInputToDirection(inputState) {
+    _convertInputToShift(inputState) {
         if (inputState.Left) return CONSTANTS.DIRECTION.LEFT;
         if (inputState.Right) return CONSTANTS.DIRECTION.RIGHT;
         if (inputState.Up) return CONSTANTS.DIRECTION.UP;
@@ -89,7 +89,6 @@ class Controls {
         };
 
         let controlInput = {
-            rotation: CONSTANTS.DIRECTION.NONE,
             direction: CONSTANTS.DIRECTION.NONE,
             start: false,
         };
@@ -152,18 +151,18 @@ class Controls {
         if (inputPressed) {
             this._inputEnabled = false;
 
-            // console.log('input disabled');
-
             // FUTURE: tweak timing for better performance
-            setTimeout(() => {
-                this._inputEnabled = true;
-                // console.log('input enabled');
-                // console.log();
-            }, 125);
+            setTimeout(() => { this._inputEnabled = true; }, 125);
         }
 
-        controlInput.rotation = this._convertInputToRotation(inputState);
-        controlInput.direction = this._convertInputToDirection(inputState);
+        // shift has precedence over rotate
+        let direction = this._convertInputToShift(inputState);
+
+        if (direction === CONSTANTS.DIRECTION.NONE) {
+            direction = this._convertInputToRotation(inputState);
+        }
+
+        controlInput.direction = direction;
         controlInput.start = inputState.Start;
 
         return controlInput;
