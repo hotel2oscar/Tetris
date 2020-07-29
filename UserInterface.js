@@ -138,8 +138,7 @@ class UserInterface {
             }
 
             drawText('PRESS START', 2, 7);
-            drawText('(OR SPACE)', 2, 6);
-            drawText('TO PLAY', 2, 5);
+            drawText('TO PLAY', 3, 5);
 
         } else {
             for (let y = 0; y < state.board.length; y++) {
