@@ -26,9 +26,13 @@ class Game {
         }
     }
 
-    get _gravityTime() { return 1000 - this.state.level * 10; }
+    get _gravityTime() { return 1000 - this.state.level * 25; }
 
     _startGravity() {
+        let gravityTime = this._gravityTime;
+
+        console.log(`gravityTime: ${gravityTime}`);
+
         return setInterval(() => {
             if (!this.state.paused) {
                 if (this.state.block.active !== null) {
@@ -39,7 +43,7 @@ class Game {
                     }
                 }
             }
-        }, this._gravityTime);
+        }, gravityTime);
     }
 
     _initializeBoard() {
